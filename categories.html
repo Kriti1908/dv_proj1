@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sunburst Chart - Nailympia</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* :root {
+            --primary-color: #2a2a2a;
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--background-color);
+            color: var(--primary-color);
+            line-height: 1.6;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--primary-color);
+            letter-spacing: -0.5px;
+        } */
+        :root {
+            --primary-blue: #0081A7; /* Added primary color */
+            --light-cream: #FDFCDC; /* Added background color */
+            --primary-color: #2a2a2a; /* Original primary color */
+            --background-color: var(--light-cream); /* Updated background */
+            --card-background: #ffffff;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Updated font */
+            background-color: var(--background-color);
+            color: var(--primary-blue); /* Updated text color */
+            line-height: 1.6;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        h2 {
+            color: var(--primary-blue); /* Updated heading color */
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .radio-container {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            background: var(--background-color);
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+
+        .radio-container label {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .radio-container label:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .radio-container input[type="radio"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 1.2rem;
+            height: 1.2rem;
+            border: 2px solid #cbd5e0;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .radio-container input[type="radio"]:checked {
+            border-color: #4299e1;
+            background: #4299e1;
+        }
+
+        .radio-container input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0.4rem;
+            height: 0.4rem;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .visualization-container {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+            margin-top: 1rem;
+        }
+
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .legend {
+            background: var(--card-background);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            min-width: 200px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+            color: var(--primary-color);
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            margin-right: 0.75rem;
+            border: none;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: var(--card-background);
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            box-shadow: var(--shadow);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 1000;
+        }
+
+        .segment-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            pointer-events: none;
+        }
+
+        .back-button {
+            background-color: #007bff; /* Blue color */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 25px; /* Capsule shape */
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+        @media (max-width: 768px) {
+            .visualization-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .legend {
+                width: 100%;
+                margin-top: 1rem;
+            }
+
+            svg {
+                width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Nailympia Categories Sunburst</h2>
+        <button class="back-button" onclick="goBack()">Back</button>
+        <div class="radio-container">
+            <label><input type="radio" name="year" value="2021"> 2021</label>
+            <label><input type="radio" name="year" value="2022"> 2022</label>
+            <label><input type="radio" name="year" value="2023"> 2023</label>
+            <label><input type="radio" name="year" value="2024" checked> 2024</label>
+        </div>
+        <div class="visualization-container">
+            <svg width="800" height="800"></svg>
+            <div class="legend"></div>
+        </div>
+        <div class="tooltip"></div>
+    </div>
+
+    <script>
+        // Original JavaScript remains the same
+        const width = 800, height = 800, radius = Math.min(width, height) / 2;
+        const svg = d3.select("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr("transform", `translate(${width / 2}, ${height / 2})`);
+
+        const legendContainer = d3.select(".legend");
+
+        const color = d3.scaleOrdinal([
+            "#ffcccb", "#b4a7d6", "#b6e1a1", "#f7a7b3", "#add8e6",
+            "#ffd966", "#d1e7e0", "#e2c9b7", "#c1c1e0", "#ffb3e6"
+        ]);
+
+        let currentYear = "2024";
+        function goBack() {
+            window.location.href = "index.html"; // Change to your actual file
+        }
+        function shadeColor(color, percent) {
+            const num = parseInt(color.slice(1), 16),
+                  amt = Math.round(2.55 * percent),
+                  R = (num >> 16) + amt,
+                  G = (num >> 8 & 0x00FF) + amt,
+                  B = (num & 0x0000FF) + amt;
+            return `#${(0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 + 
+                        (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + 
+                        (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1)}`;
+        }
+
+        function updateLegend(categories) {
+            legendContainer.html("");
+            categories.forEach((category, index) => {
+                legendContainer.append("div")
+                    .attr("class", "legend-item")
+                    .html(`<span class="legend-color" style="background: ${shadeColor(color(category), -15)}"></span>${category}`);
+            });
+        }
+
+        function computeTextAngle(d) {
+            const angle = (d.x0 + d.x1) / 2 * 180 / Math.PI - 90;
+            return angle > 90 ? angle - 180 : angle;
+        }
+
+        function fitText(text, arcLength) {
+            const charWidth = 6;
+            const maxChars = Math.floor(arcLength / charWidth);
+            if (text.length > maxChars) {
+                return text.slice(0, maxChars - 2) + '..';
+            }
+            return text;
+        }
+
+        function loadSunburst(year) {
+            d3.csv("data.csv").then(data => {
+                let filteredData = data.filter(d => d.Year === year);
+                let categoryMap = {};
+
+                filteredData.forEach(d => {
+                    if (!categoryMap[d.Category]) {
+                        categoryMap[d.Category] = { name: d.Category, children: [], count: 0 };
+                    }
+                    categoryMap[d.Category].children.push({ name: d.Location });
+                    categoryMap[d.Category].count += 1;
+                });
+
+                let hierarchyData = {
+                    name: year,
+                    children: Object.values(categoryMap).map(cat => {
+                        return { name: cat.name, children: cat.children, size: cat.count };
+                    })
+                };
+
+                const root = d3.hierarchy(hierarchyData)
+                    .sum(d => d.children ? 0 : 1)
+                    .sort((a, b) => b.value - a.value);
+
+                const partition = d3.partition().size([2 * Math.PI, radius]);
+                partition(root);
+
+                const arc = d3.arc()
+                    .startAngle(d => d.x0)
+                    .endAngle(d => d.x1)
+                    .innerRadius(d => d.depth === 1 ? d.y0 : d.y0 + 1)
+                    .outerRadius(d => d.y1);
+
+                svg.selectAll("path").remove();
+                svg.selectAll(".segment-label").remove();
+
+                svg.selectAll("path")
+                    .data(root.descendants().slice(1))
+                    .enter()
+                    .append("path")
+                    .attr("d", arc)
+                    .attr("fill", d => d.depth === 1 ? shadeColor(color(d.data.name), -15) : color(d.parent.data.name))
+                    .attr("stroke", "#fff")
+                    .attr("stroke-width", "2")
+                    .style("transition", "opacity 0.2s")
+                    .on("mouseover", (event, d) => {
+                        d3.select(".tooltip")
+                            .style("opacity", 1)
+                            .html(`<strong>${d.depth === 1 ? 'Category' : 'Country'}:</strong> ${d.data.name}`)
+                            .style("left", (event.pageX + 10) + "px")
+                            .style("top", (event.pageY + 10) + "px");
+                        
+                        d3.select(event.currentTarget)
+                            .style("opacity", 0.8);
+                    })
+                    .on("mousemove", event => {
+                        d3.select(".tooltip")
+                            .style("left", (event.pageX + 10) + "px")
+                            .style("top", (event.pageY + 10) + "px");
+                    })
+                    .on("mouseout", (event) => {
+                        d3.select(".tooltip").style("opacity", 0);
+                        d3.select(event.currentTarget)
+                            .style("opacity", 1);
+                    });
+
+                svg.selectAll(".segment-label")
+                    .data(root.descendants().slice(1))
+                    .enter()
+                    .append("text")
+                    .attr("class", "segment-label")
+                    .attr("transform", d => {
+                        const [x, y] = arc.centroid(d);
+                        const angle = computeTextAngle(d);
+                        return `translate(${x},${y}) rotate(${angle})`;
+                    })
+                    .attr("text-anchor", "middle")
+                    .attr("dy", "0.35em")
+                    .text(d => {
+                        const arcLength = (d.x1 - d.x0) * (d.y0 + d.y1) / 2;
+                        return fitText(d.data.name, arcLength);
+                    })
+                    .style("fill", d => {
+                        const brightness = d3.lab(d.depth === 1 ? 
+                            shadeColor(color(d.data.name), -15) : 
+                            color(d.parent.data.name)).l;
+                        return brightness > 60 ? "#000" : "#fff";
+                    });
+
+                updateLegend(Object.keys(categoryMap));
+            }).catch(error => console.error("Error loading data:", error));
+        }
+
+        document.querySelectorAll("input[name='year']").forEach(radio => {
+            radio.addEventListener("change", event => {
+                currentYear = event.target.value;
+                loadSunburst(currentYear);
+            });
+        });
+
+        loadSunburst(currentYear);
+    </script>
+</body>
+</html>

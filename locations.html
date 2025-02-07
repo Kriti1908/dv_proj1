@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serpentine Timeline</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #fafafa;
+            color: #333;
+        }
+        .timeline-container { width: 100%; height: 600px; position: relative; }
+        .path { fill: none; stroke-width: 12px; stroke: url(#gradient); opacity: 0.9; }
+        .ring { fill: none; stroke: #9333ea; stroke-width: 2px; opacity: 0; }
+        .dashed-line { stroke: #9333ea; stroke-dasharray: 5, 5; stroke-width: 2px; opacity: 0; }
+        .info-box { 
+            position: absolute; 
+            background: white; 
+            padding: 8px 12px; 
+            border-radius: 6px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            font-size: 14px; 
+            font-weight: 500; 
+            text-align: center;
+            opacity: 0;
+        }
+        .arrow { fill: #9333ea; }
+        
+        /* New Legend Styles */
+        .legend-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .legend-gradient {
+            width: 300px;
+            height: 20px;
+            background: linear-gradient(to right, #ff1bb1, #7c3aed, #5e5cf9);
+            border-radius: 10px;
+        }
+        .legend-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 300px;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <svg class="timeline-container">
+        <defs>
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#ff1bb1; stop-opacity:1" />
+                <stop offset="50%" style="stop-color:#7c3aed; stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#5e5cf9; stop-opacity:1" />
+            </linearGradient>
+        </defs>
+    </svg>
+    
+    <!-- New Legend Section -->
+    <div class="legend-container">
+        <div>
+            <div class="legend-gradient"></div>
+            <div class="legend-labels">
+                <span>Oldest</span>
+                <span>Middle</span>
+                <span>Latest</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        d3.csv("location_data.csv").then(function(data) {
+            const svg = d3.select(".timeline-container");
+            const width = window.innerWidth - 40;
+            const height = 600;
+            svg.attr("width", width).attr("height", height);
+
+            const xScale = d3.scaleLinear().domain([0, data.length - 1]).range([50, width - 50]);
+            const yScale = d3.scaleLinear().domain([-1, 1]).range([100, height - 100]);
+
+            const points = data.map((d, i) => {
+                const angle = i * Math.PI / 3;
+                const isHighlightPoint = (
+                    i % (Math.PI / (Math.PI / 3)) === Math.floor(Math.PI / 4 / (Math.PI / 3)) || 
+                    i % (Math.PI / (Math.PI / 3)) === Math.floor(3 * Math.PI / 4 / (Math.PI / 3)) ||
+                    i % (Math.PI / (Math.PI / 3)) === Math.floor(0 * Math.PI / 4 / (Math.PI / 3))
+                );
+                return {
+                    x: xScale(i),
+                    y: yScale(Math.sin(angle)),
+                    label: d.Location,
+                    time: d.Time,
+                    type: (i % 2 === 0) ? 'down' : 'up',
+                    highlight: isHighlightPoint,
+                    index: i
+                };
+            });
+
+            const line = d3.line()
+                .x(d => d.x - 10)
+                .y(d => d.y)
+                .curve(d3.curveBasis);
+
+            const path = svg.append("path")
+                .attr("class", "path")
+                .attr("d", line(points));
+
+            const highlightPoints = points.filter(d => d.highlight);
+            const highlightRings = svg.selectAll(".highlight-ring")
+                .data(highlightPoints)
+                .enter()
+                .append("circle")
+                .attr("class", "ring")
+                .attr("cx", d => d.x - 50)
+                .attr("cy", d => d.y)
+                .attr("r", 1);
+
+            const dashedLines = svg.selectAll(".highlight-line")
+                .data(highlightPoints)
+                .enter()
+                .append("line")
+                .attr("class", "dashed-line")
+                .attr("x1", d => d.x - 50)
+                .attr("y1", d => d.y)
+                .attr("x2", (d, i) => {
+                    const horizontalOffset = (i % 4 === 0 || i % 4 === 2) ? 0 : (i % 4 === 1) ? -50 : 50;
+                    return d.x - 50;
+                })
+                .attr("y2", (d, i) => {
+                    const verticalOffset = (i % 4 === 0 || i % 4 === 2) ? 0 : (i % 4 === 1) ? 50 : -50;
+                    return d.y + verticalOffset;
+                });
+
+            const infoBoxes = highlightPoints.map((d, i) => {
+                const box = document.createElement("div");
+                box.className = "info-box";
+                box.style.left = `${d.x - 40}px`;
+                box.style.top = (i % 4 === 0 || i % 4 === 2) 
+                    ? `${d.y}px`   
+                    : (i % 4 === 1) 
+                        ? `${d.y + 50}px`   
+                        : `${d.y - 50}px`;  
+                box.innerHTML = `<strong>${d.label}</strong><br>${d.time}`;
+                document.body.appendChild(box);
+                return box;
+            });
+
+            const arrowhead = svg.append("path")
+                .attr("class", "arrow")
+                .attr("d", "M0,-10 L20,0 L0,10 Z");
+
+            const pathLength = path.node().getTotalLength();
+            path.style("stroke-dasharray", pathLength)
+                .style("stroke-dashoffset", pathLength);
+
+            function translateAlong(path) {
+                const l = path.getTotalLength();
+                return function() {
+                    return function(t) {
+                        const p = path.getPointAtLength(t * l);
+                        const p2 = path.getPointAtLength((t * l) + 1);
+                        const angle = Math.atan2(p2.y - p.y, p2.x - p.x) * 180 / Math.PI;
+                        return `translate(${p.x},${p.y}) rotate(${angle})`;
+                    };
+                };
+            }
+
+            path.transition()
+                .duration(4000)
+                .ease(d3.easeLinear)
+                .style("stroke-dashoffset", 0)
+                .tween("pathAnimation", () => {
+                    return (t) => {
+                        const point = path.node().getPointAtLength(t * pathLength);
+                        
+                        highlightPoints.forEach((d, i) => {
+                            if (point.x >= d.x) {
+                                d3.select(highlightRings.nodes()[i])
+                                    .style("opacity", 1);
+                                d3.select(dashedLines.nodes()[i])
+                                    .style("opacity", 1);
+                                infoBoxes[i].style.opacity = 1;
+                            }
+                        });
+                    };
+                });
+
+            arrowhead.transition()
+                .duration(4000)
+                .ease(d3.easeLinear)
+                .attrTween("transform", translateAlong(path.node()));
+        });
+    </script>
+</body>
+</html>

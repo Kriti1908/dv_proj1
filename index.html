@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nail Artistry</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Color Palette */
+        :root {
+            --primary-blue: #0081A7;
+            --secondary-teal: #00AFB9;
+            --light-cream: #FDFCDC;
+            --soft-peach: #FED9B7;
+            --coral-red: #F07167;
+        }
+
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-cream);
+            color: var(--primary-blue);
+            line-height: 1.6;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            background-color: var(--primary-blue);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--light-cream);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .logo i {
+            margin-right: 15px;
+            color: var(--soft-peach);
+            font-size: 40px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--light-cream);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            padding-bottom: 5px;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--coral-red);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 50px;
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .slideshow-container {
+            width: 500px;
+            height: 600px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .slideshow-container:hover {
+            transform: scale(1.02);
+        }
+
+        .slideshow-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .slideshow-image.active {
+            opacity: 1;
+        }
+
+        .content-text {
+            max-width: 400px;
+            background-color: var(--secondary-teal);
+            color: var(--light-cream);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transform: skew(-5deg);
+            transition: all 0.3s ease;
+        }
+
+        .content-text:hover {
+            transform: skew(-5deg) translateY(-10px);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.15);
+        }
+
+        .content-text h2 {
+            color: var(--soft-peach);
+            margin-bottom: 20px;
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .content-text p {
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Accent Elements */
+        .accent-border {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border: 3px solid var(--coral-red);
+            z-index: -1;
+        }
+
+        .accent-border.top-left {
+            top: -20px;
+            left: -20px;
+        }
+
+        .accent-border.bottom-right {
+            bottom: -20px;
+            right: -20px;
+        }
+
+        /* Footer Styles */
+        .footer {
+            background-color: var(--primary-blue);
+            color: var(--light-cream);
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer-icons a {
+            color: var(--soft-peach);
+            margin: 0 10px;
+            font-size: 24px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-icons a:hover {
+            color: var(--coral-red);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-paint-brush"></i>
+            Nail Artistry
+        </div>
+        <ul class="nav-links">
+            <li><a href="locations.html">Locations</a></li>
+            <li><a href="categories.html">Categories</a></li>
+            <li><a href="medal_tally.html">Medal Tally</a></li>
+                    <!-- <li><a href="#">Contact</a></li> -->
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="slideshow-container">
+            <div class="accent-border top-left"></div>
+            <img src="img1.jpg" alt="Nail Art 1" class="slideshow-image active">
+            <img src="img2.jpg" alt="Nail Art 2" class="slideshow-image">
+            <img src="img3.jpg" alt="Nail Art 3" class="slideshow-image">
+            <img src="img4.jpg" alt="Nail Art 4" class="slideshow-image">
+            <div class="accent-border bottom-right"></div>
+        </div>
+
+        <div class="content-text">
+            <h2>Elevate Your Style</h2>
+            <p>Discover the art of beautiful nails. Our expert technicians transform your nails into stunning masterpieces, blending creativity with precision.</p>
+            <br>
+            <p>From intricate designs to classic manicures, we create nail art that reflects your unique personality and passion.</p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-text">
+            © 2025 Nail Artistry. All Rights Reserved.
+        </div>
+        <div class="footer-icons">
+            <a href="https://www.instagram.com/nailympiacompetitions"><i class="fab fa-instagram"></i></a>
+            <a href="https://en-gb.facebook.com/Nailympia/"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.nailympia.com/"><i class="fab fa-pinterest-p"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        // Slideshow JavaScript
+        document.addEventListener('DOMContentLoaded', () => {
+            const images = document.querySelectorAll('.slideshow-image');
+            let currentImageIndex = 0;
+
+            function showNextImage() {
+                // Remove active class from current image
+                images[currentImageIndex].classList.remove('active');
+                
+                // Move to next image, wrap around to start if at end
+                currentImageIndex = (currentImageIndex + 1) % images.length;
+                
+                // Add active class to next image
+                images[currentImageIndex].classList.add('active');
+            }
+
+            // Change image every 3 seconds
+            setInterval(showNextImage, 3000);
+        });
+    </script>
+</body>
+</html>
