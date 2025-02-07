@@ -41,8 +41,8 @@
             --primary-blue: #0081A7; /* Added primary color */
             --light-cream: #FDFCDC; /* Added background color */
             --primary-color: #2a2a2a; /* Original primary color */
-            --background-color: var(--light-cream); /* Updated background */
-            --card-background: #ffffff;
+            --background-color: #f0de88; /* Updated background */
+            --card-background: #FDFCDC;
             --border-radius: 12px;
             --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
@@ -68,7 +68,7 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background-color: var(--card-background);
+            background-color: #FDFCDC;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             padding: 2rem;
@@ -133,11 +133,13 @@
             gap: 2rem;
             align-items: flex-start;
             margin-top: 1rem;
+            
         }
 
         svg {
             max-width: 100%;
             height: auto;
+            background-color: #FDFCDC;
         }
 
         .legend {
@@ -184,7 +186,7 @@
         }
 
         .back-button {
-            background-color: #007bff; /* Blue color */
+            background-color: #148bd9; /* Blue color */
             color: white;
             border: none;
             padding: 10px 20px;
@@ -192,10 +194,14 @@
             border-radius: 25px; /* Capsule shape */
             cursor: pointer;
             transition: background-color 0.3s ease;
+            margin: 10px;
+            border-radius: 35px;
+            font-size: 20px;
+            padding: 20px 30px;
         }
 
         .back-button:hover {
-            background-color: #0056b3; /* Darker blue on hover */
+            background-color: #0e5bac; /* Darker blue on hover */
         }
         @media (max-width: 768px) {
             .visualization-container {
@@ -218,7 +224,7 @@
 <body>
     <div class="container">
         <h2>Nailympia Categories Sunburst</h2>
-        <button class="back-button" onclick="goBack()">Back</button>
+        <button class="back-button" onclick="goBack()">&lt; Back</button>
         <div class="radio-container">
             <label><input type="radio" name="year" value="2021"> 2021</label>
             <label><input type="radio" name="year" value="2022"> 2022</label>
